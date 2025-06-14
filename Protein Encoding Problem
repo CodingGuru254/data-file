@@ -1,0 +1,111 @@
+# Peptide Encoding Problem: Find substrings of a genome encoding.
+# What is the DNA pattern? ATGGCCATGGCCCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA
+# What is the peptide pattern? MA
+def complementD(DNAstring):
+    """Get the reverse complement of a DNA string"""
+    DNAstring = list(DNAstring)
+    for n, i in enumerate(DNAstring):
+        if i == "A":
+            DNAstring[n] = "T"
+        elif i == "T":
+            DNAstring[n] = "A"
+        elif i == "C":
+            DNAstring[n] = "G"
+        elif i == "G":
+            DNAstring[n] = "C"
+
+    DNAstring.reverse()
+    return ''.join(DNAstring)
+
+def complementR(RNAstring):
+    """Get the reverse complement of an RNA string"""
+    RNAstring = list(RNAstring)
+    for n, i in enumerate(RNAstring):
+        if i == "A":
+            RNAstring[n] = "U"
+        elif i == "U":
+            RNAstring[n] = "A"
+        elif i == "C":
+            RNAstring[n] = "G"
+        elif i == "G":
+            RNAstring[n] = "C"
+
+    RNAstring.reverse()
+    return ''.join(RNAstring)
+
+def checkMatch(answer, peptide):
+    """Check for matches of peptide in the amino acid sequence"""
+    checkPosition = []
+    output = []
+
+    for i in range(0, len(answer) - len(peptide) + 1):
+        sample = answer[i:i + len(peptide)]
+        if sample == peptide:
+            checkPosition.append(i * 3)  # Adjust position in terms of codon triplets
+
+    return checkPosition
+
+def stringAmino(n, Rdataset, codonToAmino):
+    """Convert RNA to amino acid string"""
+    stringAmino = []
+    for i in range(n, len(Rdataset), 3):
+        triplet = Rdataset[i:i + 3]
+        if triplet in codonToAmino:
+            stringAmino.append(codonToAmino[triplet])
+    return ''.join(stringAmino)
+
+def revert(strand, codonToAmino):
+    """Revert the codon strand by converting it to amino acid sequence"""
+    output = []
+    for i in strand:
+        x = complementD(i)  # Reverse complement each string
+        output.append(x)
+    return ' '.join(output)
+
+# Input DNA pattern and sample peptide
+dataset = input("What is the DNA pattern? ")
+peptide = input("What is the peptide pattern? ")
+codonToAmino = {
+    'AUG': 'M', 'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L',
+    'CUU': 'L', 'CUC': 'L', 'CUA': 'L', 'CUG': 'L', 'AUU': 'I',
+    'AUC': 'I', 'AUA': 'I', 'AUG': 'M', 'GUU': 'V', 'GUC': 'V',
+    'GUA': 'V', 'GUG': 'V', 'UCU': 'S', 'UCC': 'S', 'UCA': 'S',
+    'UCG': 'S', 'CCU': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+    'CAU': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q', 'CGU': 'R',
+    'CGC': 'R', 'CGA': 'R', 'CGG': 'R', 'AUU': 'I', 'AUC': 'I',
+    'AUA': 'I', 'AUG': 'M', 'UGA': 'Stop', 'UAA': 'Stop', 'UAG': 'Stop'
+}
+
+# Transcribe DNA to RNA
+Rdataset = dataset.replace("T", "U")
+RRdataset = complementR(Rdataset)
+
+# Convert dataset into amino acid string to compare with peptide
+a = stringAmino(0, Rdataset, codonToAmino)
+b = stringAmino(1, Rdataset, codonToAmino)
+c = stringAmino(2, Rdataset, codonToAmino)
+d = stringAmino(0, RRdataset, codonToAmino)
+e = stringAmino(1, RRdataset, codonToAmino)
+f = stringAmino(2, RRdataset, codonToAmino)
+
+# Look through peptide strands to find matches
+a1 = checkMatch(a, peptide)
+b1 = checkMatch(b, peptide)
+c1 = checkMatch(c, peptide)
+d1 = checkMatch(d, peptide)
+e1 = checkMatch(e, peptide)
+f1 = checkMatch(f, peptide)
+# Print matches from all frames and reverse strands
+a1x = ' '.join(map(str, a1))
+b1x = ' '.join(map(str, b1))
+c1x = ' '.join(map(str, c1))
+d1x = revert(d1, codonToAmino)
+e1x = revert(e1, codonToAmino)
+f1x = revert(f1, codonToAmino)
+
+print(a1x)
+print(b1x)
+print(c1x)
+print(d1x)
+print(e1x)
+print(f1x)
