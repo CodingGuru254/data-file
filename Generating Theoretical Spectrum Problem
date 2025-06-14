@@ -1,0 +1,40 @@
+# Generating Theoretical Spectrum Problem: Generate the theoretical spectrum 
+# of a cyclic peptide.
+# What is the peptide string? NQEL
+# Output: {0 113 113 114 114 128 128 129 129 227 242 242 242 242 257 257 355 356 370 370 371 371 484}
+massTable = {
+    'G': 57,  'A': 71,  'S': 87,  'P': 97,  'V': 99,
+    'T': 101, 'C': 103, 'I': 113, 'L': 113, 'N': 114,
+    'D': 115, 'K': 128, 'Q': 128, 'E': 129, 'M': 131,
+    'H': 137, 'F': 147, 'R': 156, 'Y': 163, 'W': 186
+}
+
+def peptideCombo(peptide):
+    linPepCombo = []
+    # Linear subpeptides (including full peptide and empty string)
+    linPepCombo.append('')  # for 0 mass
+    for a in range(len(peptide)):
+        for b in range(a, len(peptide)):
+            linPepCombo.append(peptide[a:b + 1])
+    
+    # Cyclic subpeptides (exclude full peptide and empty)
+    cycPepCombo = []
+    extended = peptide + peptide
+    length = len(peptide)
+    for sublen in range(1, length):
+        for start in range(length):
+            subpep = extended[start:start + sublen]
+            cycPepCombo.append(subpep)
+    return linPepCombo + cycPepCombo
+def calcSpectrum(peptideCombo):
+    spectrum = []
+    for p in peptideCombo:
+        mass = sum(massTable[aa] for aa in p)
+        spectrum.append(mass)
+    return sorted(spectrum)
+peptide = input("What is the peptide string? ").strip().upper()
+pep = peptideCombo(peptide)
+spectrum = calcSpectrum(pep)
+answer = ' '.join(str(i) for i in spectrum)
+
+print(answer)
