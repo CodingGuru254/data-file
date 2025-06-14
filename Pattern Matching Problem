@@ -1,1 +1,19 @@
+# Pattern Matching Problem: Find all occurrences of a pattern in a string.
+#What is the genetic sequence? ACGTTGCATGTCGCATGATGCATGAGAGCT
+#What is the pattern? CATG
+#Output: 6 13 20
+sequence = input("What is the genetic sequence? ")
+pattern = input("What is the pattern? ")
 
+DNA = str(sequence.upper())
+kmer = str(pattern.upper())
+k = len(kmer)
+output = list()
+
+for i in range(0, len(DNA) - k + 1):
+	substring = DNA[i:i + k]
+	if substring == kmer:
+		output.append(str(i))
+
+answer = ' '.join(output)
+print(answer)
