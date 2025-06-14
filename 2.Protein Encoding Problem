@@ -1,0 +1,113 @@
+# Peptide Encoding Problem: Find substrings of a genome encoding a given 
+# amino acid sequence.
+# What is the DNA string? ATGGCCATGGCCCCCAGAACTGAGATCAATAGTACCCGTATTAACGGGTGA
+# What is the peptide string? MA
+#Output:
+#ATGGCC
+#ATGGCC
+#TGGCCA
+def stringAmino(n, Rdataset):
+    stringAmino = []
+    for i in range(n, len(Rdataset), 3):
+        triplet = Rdataset[i:i+3]
+        if triplet in codonToAmino:
+            stringAmino.append(codonToAmino[triplet])
+    return ''.join(stringAmino)
+
+def findW(w, pep, i):
+    return pep.find(w, i)
+
+def findAllW(w, pep, i):
+    positions = []
+    while i < len(pep):
+        a = findW(w, pep, i)
+        if a >= 0:
+            positions.append(a)
+            i = a + 1
+        else:
+            break
+    return positions
+
+def complementR(RNAstring):
+    comp = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
+    RNAstring = [comp[nuc] for nuc in RNAstring]
+    RNAstring.reverse()
+    return ''.join(RNAstring)
+
+def revertF(positions, DNA, i):
+    DNAsub = []
+    for a in positions:
+        b = a * 3 + i
+        sub = DNA[b:b + 3 * len(w)]
+        DNAsub.append(sub)
+    return DNAsub
+
+def revertR(positions, DNA, i):
+    DNAsub = []
+    for a in positions:
+        b = a * 3 + i
+        c = len(DNA) - b - 1
+        d = c - 3 * len(w)
+        sub = DNA[d:d + 3 * len(w)]
+        DNAsub.append(sub)
+    return DNAsub
+
+# === INPUT ===
+DNA = input("What is the DNA string? ").strip()
+w = input("What is the peptide string? ").strip()
+codon_table = '''
+UUU F CUU L AUU I GUU V
+UUC F CUC L AUC I GUC V
+UUA L CUA L AUA I GUA V
+UUG L CUG L AUG M GUG V
+UCU S CCU P ACU T GCU A
+UCC S CCC P ACC T GCC A
+UCA S CCA P ACA T GCA A
+UCG S CCG P ACG T GCG A
+UAU Y CAU H AAU N GAU D
+UAC Y CAC H AAC N GAC D
+UAA Stop CAA Q AAA K GAA E
+UAG Stop CAG Q AAG K GAG E
+UGU C CGU R AGU S GGU G
+UGC C CGC R AGC S GGC G
+UGA Stop CGA R AGA R GGA G
+UGG W CGG R AGG R GGG G
+'''
+
+codonToAmino = {}
+for line in codon_table.strip().split('\n'):
+    parts = line.strip().split()
+    for i in range(0, len(parts), 2):
+        codonToAmino[parts[i]] = parts[i + 1]
+
+#Transcription and reverse complement
+RNA = DNA.replace("T", "U")
+revRNA = complementR(list(RNA))
+
+#Translate to peptide strings
+pep0 = stringAmino(0, RNA)
+pep1 = stringAmino(1, RNA)
+pep2 = stringAmino(2, RNA)
+rpep0 = stringAmino(0, revRNA)
+rpep1 = stringAmino(1, revRNA)
+rpep2 = stringAmino(2, revRNA)
+
+#Find peptide matches
+a = findAllW(w, pep0, 0)
+b = findAllW(w, pep1, 0)
+c = findAllW(w, pep2, 0)
+d = findAllW(w, rpep0, 0)
+e = findAllW(w, rpep1, 0)
+f = findAllW(w, rpep2, 0)
+
+#Get matching DNA substrings
+a1 = revertF(a, DNA, 0)
+b1 = revertF(b, DNA, 1)
+c1 = revertF(c, DNA, 2)
+d1 = revertR(d, DNA, 0)
+e1 = revertR(e, DNA, 1)
+f1 = revertR(f, DNA, 2)
+
+#Print final results
+for result in a1 + b1 + c1 + d1 + e1 + f1:
+    print(result)
